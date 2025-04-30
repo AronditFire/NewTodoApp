@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/AronditFire/todo-app/internal/service"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,22 +14,27 @@ func NewHander(sv *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
-	router.Use(gin.Logger(), cors.Default())
+	router := gin.Default()
 
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.registerUser)
 		auth.POST("/sign-in", h.loginUser)
+		auth.POST("/refresh", h.refreshTokens)
 	}
 
-	api := router.Group("/api" /*Middleware*/)
+	api := router.Group("/api", h.userIdentify)
 	{
 		api.GET("/", h.getAllTasks)      // get all tasks
 		api.GET("/:id", h.getTaskByID)   // get 1 task
 		api.POST("/", h.createTask)      // create task
 		api.PUT("/:id", h.updateTask)    // update task
 		api.DELETE("/:id", h.deleteTask) // delete task
+
+		admin := api.Group("/admin", h.adminIdentify)
+		{
+			admin.POST("/" /*JSON FILE PARSE*/)
+		}
 	}
 
 	return router

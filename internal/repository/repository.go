@@ -16,7 +16,7 @@ type TaskList interface {
 type Authorization interface {
 	CreateUser(userReg entity.UserRegisterRequest) error
 	GetUser(username string) (entity.User, error)
-	LoginUser(userLogin entity.UserAuthRequest) (entity.User, error)
+	GetUserByID(id int) (entity.User, error)
 }
 
 type Repository struct {

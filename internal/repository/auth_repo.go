@@ -60,7 +60,7 @@ func (r *AuthRepo) GetUser(username string) (entity.User, error) {
 	return user, tx.Commit().Error
 }
 
-func (r *AuthRepo) LoginUser(userLogin entity.UserAuthRequest) (entity.User, error) {
+func (r *AuthRepo) GetUserByID(id int) (entity.User, error) {
 	var user entity.User
 
 	tx := r.db.Begin()
@@ -74,7 +74,7 @@ func (r *AuthRepo) LoginUser(userLogin entity.UserAuthRequest) (entity.User, err
 		return entity.User{}, err
 	}
 
-	if err := tx.First(&user, "username = ?", userLogin.Username).Error; err != nil {
+	if err := tx.First(&user, "id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return entity.User{}, err
 	}

@@ -80,8 +80,6 @@ func (r *TaskRepo) GetTaskByID(id int) (entity.Task, error) {
 
 func (r *TaskRepo) UpdateTask(id int, desc string) error {
 	var task entity.Task
-	task.ID = id
-	task.Description = desc
 
 	tx := r.db.Begin()
 	defer func() {
@@ -93,6 +91,13 @@ func (r *TaskRepo) UpdateTask(id int, desc string) error {
 	if err := tx.Error; err != nil {
 		return err
 	}
+
+	if err := tx.First(&task, "id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	task.Description = desc
 
 	if err := tx.Save(&task).Error; err != nil {
 		tx.Rollback()
@@ -103,6 +108,7 @@ func (r *TaskRepo) UpdateTask(id int, desc string) error {
 }
 
 func (r *TaskRepo) DeleteTask(id int) error {
+	var task entity.Task
 	tx := r.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -111,6 +117,11 @@ func (r *TaskRepo) DeleteTask(id int) error {
 	}()
 
 	if err := tx.Error; err != nil {
+		return err
+	}
+
+	if err := tx.First(&task, "id = ?", id).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
