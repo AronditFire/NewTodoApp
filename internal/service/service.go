@@ -6,11 +6,11 @@ import (
 )
 
 type TaskList interface {
-	CreateTask(task entity.Task) error
-	GetAllTask() ([]entity.Task, error)
-	GetTaskByID(id int) (entity.Task, error)
-	UpdateTask(id int, desc string) error
-	DeleteTask(id int) error
+	CreateTask(userID int, task entity.Task) error
+	GetAllTask(userID int) ([]entity.Task, error)
+	GetTaskByID(userID, id int) (entity.Task, error)
+	UpdateTask(userID, taskId int, desc string) error
+	DeleteTask(userID, taskID int) error
 }
 
 type Authorization interface {

@@ -15,38 +15,38 @@ func NewTaskService(repo repository.TaskList) *TaskService {
 	return &TaskService{repo: repo}
 }
 
-func (s *TaskService) CreateTask(task entity.Task) error {
+func (s *TaskService) CreateTask(userID int, task entity.Task) error {
 	if (len(task.Description) > 0) || (len(task.Description) < 1000) {
-		return s.repo.CreateTask(task)
+		return s.repo.CreateTask(userID, task)
 	} else {
 		return errors.New("Invalid description length!")
 	}
 }
 
-func (s *TaskService) GetAllTask() ([]entity.Task, error) {
-	return s.repo.GetAllTask()
+func (s *TaskService) GetAllTask(userID int) ([]entity.Task, error) {
+	return s.repo.GetAllTask(userID)
 }
 
-func (s *TaskService) GetTaskByID(id int) (entity.Task, error) {
+func (s *TaskService) GetTaskByID(userID, id int) (entity.Task, error) {
 	if id > 0 {
-		return s.repo.GetTaskByID(id)
+		return s.repo.GetTaskByID(userID, id)
 	} else {
 		return entity.Task{}, errors.New("Invalid id while trying to get task by ID")
 	}
 }
 
-func (s *TaskService) UpdateTask(id int, desc string) error {
+func (s *TaskService) UpdateTask(userID, taskId int, desc string) error {
 	if (len(desc) > 0) || (len(desc) < 1000) {
-		return s.repo.UpdateTask(id, desc)
+		return s.repo.UpdateTask(userID, taskId, desc)
 	} else {
 		return errors.New("Invalid description length to update!")
 	}
 
 }
 
-func (s *TaskService) DeleteTask(id int) error {
-	if id > 0 {
-		return s.repo.DeleteTask(id)
+func (s *TaskService) DeleteTask(userID, taskID int) error {
+	if taskID > 0 {
+		return s.repo.DeleteTask(userID, taskID)
 	} else {
 		return errors.New("Invalid id while trying to delete task")
 	}

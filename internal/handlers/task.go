@@ -13,10 +13,17 @@ type GetAllTaskResponse struct {
 }
 
 func (h *Handler) getAllTasks(c *gin.Context) {
-	tasks, err := h.services.TaskList.GetAllTask()
+	userID, err := getUserId(c)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not get tasks",
+			"error": err.Error(),
+		})
+	}
+
+	tasks, err := h.services.TaskList.GetAllTask(userID)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not get tasks for this user",
 		})
 		return
 	}
@@ -26,6 +33,13 @@ func (h *Handler) getAllTasks(c *gin.Context) {
 }
 
 func (h *Handler) getTaskByID(c *gin.Context) {
+	userID, err := getUserId(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -34,7 +48,7 @@ func (h *Handler) getTaskByID(c *gin.Context) {
 		return
 	}
 
-	task, err := h.services.TaskList.GetTaskByID(id)
+	task, err := h.services.TaskList.GetTaskByID(userID, id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not get task by ID",
@@ -46,6 +60,13 @@ func (h *Handler) getTaskByID(c *gin.Context) {
 }
 
 func (h *Handler) createTask(c *gin.Context) {
+	userID, err := getUserId(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
 	var req entity.Task
 	if err := c.BindJSON(&req); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -54,7 +75,7 @@ func (h *Handler) createTask(c *gin.Context) {
 		return
 	}
 
-	err := h.services.TaskList.CreateTask(req)
+	err = h.services.TaskList.CreateTask(userID, req)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create task in database",
@@ -70,6 +91,13 @@ func (h *Handler) createTask(c *gin.Context) {
 // TODO: При попытке обновления не существующего таска, вместо ошибки создаёт новый
 
 func (h *Handler) updateTask(c *gin.Context) {
+	userID, err := getUserId(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -85,7 +113,7 @@ func (h *Handler) updateTask(c *gin.Context) {
 		return
 	}
 
-	err = h.services.TaskList.UpdateTask(id, updatedDesc.Description)
+	err = h.services.TaskList.UpdateTask(userID, id, updatedDesc.Description)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not update task in database",
@@ -96,6 +124,13 @@ func (h *Handler) updateTask(c *gin.Context) {
 
 // TODO: При удалении несуществующего такса код 200
 func (h *Handler) deleteTask(c *gin.Context) {
+	userID, err := getUserId(c)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+	}
+
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -104,7 +139,7 @@ func (h *Handler) deleteTask(c *gin.Context) {
 		return
 	}
 
-	err = h.services.TaskList.DeleteTask(id)
+	err = h.services.TaskList.DeleteTask(userID, id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not delete task in database",

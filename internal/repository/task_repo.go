@@ -13,7 +13,7 @@ func NewTaskRepo(db *gorm.DB) *TaskRepo {
 	return &TaskRepo{db: db}
 }
 
-func (r *TaskRepo) CreateTask(task entity.Task) error {
+func (r *TaskRepo) CreateTask(userID int, task entity.Task) error {
 	tx := r.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -25,6 +25,8 @@ func (r *TaskRepo) CreateTask(task entity.Task) error {
 		return err
 	}
 
+	task.UserID = userID
+
 	if err := tx.Create(&task).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -34,7 +36,7 @@ func (r *TaskRepo) CreateTask(task entity.Task) error {
 
 }
 
-func (r *TaskRepo) GetAllTask() ([]entity.Task, error) {
+func (r *TaskRepo) GetAllTask(userID int) ([]entity.Task, error) {
 	var tasks []entity.Task
 
 	tx := r.db.Begin()
@@ -48,7 +50,7 @@ func (r *TaskRepo) GetAllTask() ([]entity.Task, error) {
 		return nil, err
 	}
 
-	if err := tx.Find(&tasks).Error; err != nil {
+	if err := tx.Where("user_id = ?", userID).Find(&tasks).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -56,7 +58,7 @@ func (r *TaskRepo) GetAllTask() ([]entity.Task, error) {
 	return tasks, tx.Commit().Error
 }
 
-func (r *TaskRepo) GetTaskByID(id int) (entity.Task, error) {
+func (r *TaskRepo) GetTaskByID(userID, id int) (entity.Task, error) {
 	var task entity.Task
 
 	tx := r.db.Begin()
@@ -70,7 +72,7 @@ func (r *TaskRepo) GetTaskByID(id int) (entity.Task, error) {
 		return entity.Task{}, err
 	}
 
-	if err := tx.First(&task, "id = ?", id).Error; err != nil {
+	if err := tx.Where("user_id = ? AND id = ?", userID, id).First(&task).Error; err != nil {
 		tx.Rollback()
 		return entity.Task{}, err
 	}
@@ -78,7 +80,7 @@ func (r *TaskRepo) GetTaskByID(id int) (entity.Task, error) {
 	return task, tx.Commit().Error
 }
 
-func (r *TaskRepo) UpdateTask(id int, desc string) error {
+func (r *TaskRepo) UpdateTask(userID, taskId int, desc string) error {
 	var task entity.Task
 
 	tx := r.db.Begin()
@@ -92,7 +94,7 @@ func (r *TaskRepo) UpdateTask(id int, desc string) error {
 		return err
 	}
 
-	if err := tx.First(&task, "id = ?", id).Error; err != nil {
+	if err := tx.Where("user_id = ? AND id = ?", userID, taskId).First(&task).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -107,7 +109,7 @@ func (r *TaskRepo) UpdateTask(id int, desc string) error {
 	return tx.Commit().Error
 }
 
-func (r *TaskRepo) DeleteTask(id int) error {
+func (r *TaskRepo) DeleteTask(userID, taskID int) error {
 	var task entity.Task
 	tx := r.db.Begin()
 	defer func() {
@@ -120,12 +122,12 @@ func (r *TaskRepo) DeleteTask(id int) error {
 		return err
 	}
 
-	if err := tx.First(&task, "id = ?", id).Error; err != nil {
+	if err := tx.Where("user_id = ? AND id = ?", userID, taskID).First(&task).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	if err := tx.Delete(&entity.Task{}, "id = ?", id).Error; err != nil {
+	if err := tx.Delete(&task).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
