@@ -48,7 +48,7 @@ func (h *Handler) loginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"accesstoken":  accessToken,
+		"accessToken":  accessToken,
 		"refreshToken": refreshToken,
 	})
 }
