@@ -19,14 +19,21 @@ type Authorization interface {
 	GetUserByID(id int) (entity.User, error)
 }
 
+type ParsingJSON interface {
+	ParseJSON(bindfile entity.BindFile) error
+	GetJsonTable() ([]map[string]any, error)
+}
+
 type Repository struct {
 	TaskList
 	Authorization
+	ParsingJSON
 }
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		TaskList:      NewTaskRepo(db),
 		Authorization: NewAuthRepo(db),
+		ParsingJSON:   NewParseRepo(db),
 	}
 }

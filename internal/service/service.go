@@ -23,14 +23,21 @@ type Authorization interface {
 	RenewTokens(id int) (string, string, error)
 }
 
+type ParsingJSON interface {
+	ParseJSON(bindfile entity.BindFile) error
+	GetJsonTable() ([]map[string]any, error)
+}
+
 type Service struct {
 	TaskList
 	Authorization
+	ParsingJSON
 }
 
 func NewService(repo *repository.Repository) *Service {
 	return &Service{
 		TaskList:      NewTaskService(repo.TaskList),
 		Authorization: NewAuthService(repo.Authorization),
+		ParsingJSON:   NewParseService(repo.ParsingJSON),
 	}
 }

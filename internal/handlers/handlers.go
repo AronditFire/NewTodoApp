@@ -33,7 +33,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 		admin := api.Group("/admin", h.adminIdentify)
 		{
-			admin.POST("/" /*JSON FILE PARSE*/)
+			admin.POST("/upload-file", h.parseJsonFile)
 		}
 	}
 
