@@ -64,7 +64,24 @@ func (r *ParseRepo) ParseJSON(bindfile entity.BindFile) error {
 }
 
 func (r *ParseRepo) GetJsonTable() ([]map[string]any, error) {
-	return nil, nil
+	var FilesData []map[string]any
+
+	tx := r.db.Begin() // tx launch
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+	if err := tx.Error; err != nil {
+		return nil, err
+	}
+
+	if err := tx.Table(fileTable).Find(&FilesData).Error; err != nil {
+		tx.Rollback()
+		return nil, errors.New("Could not write data in FilesData")
+	}
+
+	return FilesData, tx.Commit().Error
 }
 
 func inferSQLType(value any) string {

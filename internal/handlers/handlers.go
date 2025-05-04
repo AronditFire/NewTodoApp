@@ -34,6 +34,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		admin := api.Group("/admin", h.adminIdentify)
 		{
 			admin.POST("/upload-file", h.parseJsonFile)
+			admin.GET("/get-files", h.getJsonFiles)
 		}
 	}
 

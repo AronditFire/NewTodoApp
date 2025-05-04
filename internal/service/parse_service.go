@@ -25,5 +25,5 @@ func (s *ParseService) ParseJSON(bindfile entity.BindFile) error {
 }
 
 func (s *ParseService) GetJsonTable() ([]map[string]any, error) {
-	return nil, nil
+	return s.repo.GetJsonTable()
 }
