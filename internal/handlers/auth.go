@@ -7,6 +7,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary SignUp
+// @Tags auth
+// @Description create account
+// @ID create-account
+// @Accept  json
+// @Produce  json
+// @Param input body entity.UserRegisterRequest true "account info"
+// @Success 201 {string} string "message"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
+// @Failure default {string} string "error"
+// @Router /auth/sign-up [post]
 func (h *Handler) registerUser(c *gin.Context) {
 	var req entity.UserRegisterRequest
 
@@ -29,6 +41,19 @@ func (h *Handler) registerUser(c *gin.Context) {
 	})
 }
 
+// @Summary SignIn
+// @Tags auth
+// @Description login
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Param input body entity.UserAuthRequest true "credentials"
+// @Success 200 {object} object "Успешный ответ"
+// @Response 200 {object} map[string]any "Успешный ответ"
+// @Failure 400,401 {string} string "error"
+// @Failure 500 {string} string "error"
+// @Failure default {string} string "error"
+// @Router /auth/sign-in [post]
 func (h *Handler) loginUser(c *gin.Context) {
 	var req entity.UserAuthRequest
 

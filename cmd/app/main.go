@@ -15,6 +15,17 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a my first rest api.
+
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Could not load .env file: %v", err)

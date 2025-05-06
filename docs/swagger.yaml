@@ -1,0 +1,160 @@
+basePath: /
+definitions:
+  entity.Task:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      userID:
+        type: integer
+    type: object
+  entity.UserAuthRequest:
+    properties:
+      pass:
+        type: string
+      username:
+        type: string
+    required:
+    - pass
+    - username
+    type: object
+  entity.UserRegisterRequest:
+    properties:
+      pass:
+        type: string
+      username:
+        type: string
+    required:
+    - pass
+    - username
+    type: object
+  handlers.GetAllTaskResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/entity.Task'
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a my first rest api.
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /api/:
+    get:
+      consumes:
+      - application/json
+      description: get all tasks
+      operationId: get-all-lists
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.GetAllTaskResponse'
+        "400":
+          description: error
+          schema:
+            type: string
+        "404":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+        default:
+          description: error
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get All tasks
+      tags:
+      - tasks
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: login
+      operationId: login
+      parameters:
+      - description: credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: error
+          schema:
+            type: string
+        "401":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+        default:
+          description: error
+          schema:
+            type: string
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.UserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: message
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+        default:
+          description: error
+          schema:
+            type: string
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

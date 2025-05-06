@@ -12,6 +12,18 @@ type GetAllTaskResponse struct {
 	Data []entity.Task `json:"data"`
 }
 
+// @Summary Get All tasks
+// @Security ApiKeyAuth
+// @Tags tasks
+// @Description get all tasks
+// @ID get-all-lists
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} GetAllTaskResponse
+// @Failure 400,404 {string} string "error"
+// @Failure 500 {string} string "error"
+// @Failure default {string} string "error"
+// @Router /api/ [get]
 func (h *Handler) getAllTasks(c *gin.Context) {
 	userID, err := getUserId(c)
 	if err != nil {
