@@ -4,7 +4,11 @@ WORKDIR /app
 
 COPY . .
 
-RUN go mod downlaod
-RUN go build -o myapp ./cmd/app/main.go
+RUN apt-get update
+RUN apt-get -y install postgresql-client
 
-CMD ["./myapp"]
+RUN chmod +x wait-for-postgres.sh
+
+RUN go build -o todo-app ./cmd/app/main.go
+
+CMD ["./wait-for-postgres.sh", "db", "./todo-app"]
