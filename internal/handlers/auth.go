@@ -58,7 +58,7 @@ func (h *Handler) loginUser(c *gin.Context) {
 	var req entity.UserAuthRequest
 
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request body",
 		})
 		return
@@ -81,8 +81,8 @@ func (h *Handler) loginUser(c *gin.Context) {
 func (h *Handler) refreshTokens(c *gin.Context) {
 	var req entity.RefreshRequest
 	if err := c.BindJSON(&req); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid input body",
 		})
 		return
 	}
