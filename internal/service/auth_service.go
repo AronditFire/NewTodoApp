@@ -18,7 +18,7 @@ var (
 	RefreshTokenTTL = 24 * time.Hour
 )
 
-type tokenClaims struct {
+type TokenClaims struct {
 	jwt.RegisteredClaims
 	UserID  int
 	IsAdmin bool
@@ -67,7 +67,7 @@ func (s *AuthService) LoginUser(userLogin entity.UserAuthRequest) (string, strin
 		return "", "", errors.New("Incorrect password")
 	}
 	// access token
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessTokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -82,7 +82,7 @@ func (s *AuthService) LoginUser(userLogin entity.UserAuthRequest) (string, strin
 	}
 
 	// refresh token
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(RefreshTokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -100,26 +100,26 @@ func (s *AuthService) LoginUser(userLogin entity.UserAuthRequest) (string, strin
 	return accessTokenSigned, refreshTokenSigned, err
 }
 
-func (s *AuthService) ParseAccessToken(accessTokenStr string) (*tokenClaims, error) {
-	token, err := jwt.ParseWithClaims(accessTokenStr, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (s *AuthService) ParseAccessToken(accessTokenStr string) (*TokenClaims, error) {
+	token, err := jwt.ParseWithClaims(accessTokenStr, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
 		return []byte(AccessSecret), nil
 	})
 	if err != nil {
-		return &tokenClaims{}, err
+		return &TokenClaims{}, err
 	}
-	claims, ok := token.Claims.(*tokenClaims)
+	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
-		return &tokenClaims{}, errors.New("token claims are not of type *tokenClaims")
+		return &TokenClaims{}, errors.New("token claims are not of type *tokenClaims")
 	}
 
 	return claims, nil
 }
 
 func (s *AuthService) ParseRefreshToken(refreshTokenStr string) (int, error) {
-	token, err := jwt.ParseWithClaims(refreshTokenStr, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(refreshTokenStr, &TokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
@@ -129,7 +129,7 @@ func (s *AuthService) ParseRefreshToken(refreshTokenStr string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	claims, ok := token.Claims.(*tokenClaims)
+	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
 		return 0, errors.New("token claims are not of type *tokenClaims")
 	}
@@ -144,7 +144,7 @@ func (s *AuthService) RenewTokens(id int) (string, string, error) {
 	}
 
 	// access token
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessTokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -159,7 +159,7 @@ func (s *AuthService) RenewTokens(id int) (string, string, error) {
 	}
 
 	// refresh token
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(RefreshTokenTTL)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

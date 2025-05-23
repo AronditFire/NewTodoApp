@@ -5,6 +5,8 @@ import (
 	"github.com/AronditFire/todo-app/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type TaskList interface {
 	CreateTask(userID int, task entity.Task) error
 	GetAllTask(userID int) ([]entity.Task, error)
@@ -18,7 +20,7 @@ type Authorization interface {
 	GetUser(username string) (entity.User, error)
 	GetUserByID(id int) (entity.User, error)
 	LoginUser(userLogin entity.UserAuthRequest) (string, string, error)
-	ParseAccessToken(accessTokenStr string) (*tokenClaims, error)
+	ParseAccessToken(accessTokenStr string) (*TokenClaims, error)
 	ParseRefreshToken(refreshTokenStr string) (int, error)
 	RenewTokens(id int) (string, string, error)
 }
