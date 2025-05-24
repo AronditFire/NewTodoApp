@@ -14,7 +14,7 @@ const (
 	adminCtx            = "isAdmin"
 )
 
-func (h *Handler) userIdentify(c *gin.Context) { // TODO: 401, но выводит всё равно данные
+func (h *Handler) userIdentify(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
 
 	if header == "" {
@@ -28,6 +28,13 @@ func (h *Handler) userIdentify(c *gin.Context) { // TODO: 401, но выводи
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 			"error": "invalid header",
+		})
+		return
+	}
+
+	if len(headerParts[1]) == 0 {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"error": "empty token",
 		})
 		return
 	}
@@ -56,7 +63,6 @@ func (h *Handler) adminIdentify(c *gin.Context) {
 	c.Next()
 }
 
-// will be realized
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(userCtx)
 	if !ok {

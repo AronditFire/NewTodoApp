@@ -21,7 +21,7 @@ func (h *Handler) parseJsonFile(c *gin.Context) {
 	}
 
 	if err := h.services.ParsingJSON.ParseJSON(bindfile); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return

@@ -100,8 +100,6 @@ func (h *Handler) createTask(c *gin.Context) {
 	})
 }
 
-// TODO: При попытке обновления не существующего таска, вместо ошибки создаёт новый
-
 func (h *Handler) updateTask(c *gin.Context) {
 	userID, err := getUserId(c)
 	if err != nil {
@@ -132,9 +130,12 @@ func (h *Handler) updateTask(c *gin.Context) {
 		})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "updated",
+	})
 }
 
-// TODO: При удалении несуществующего такса код 200
 func (h *Handler) deleteTask(c *gin.Context) {
 	userID, err := getUserId(c)
 	if err != nil {
