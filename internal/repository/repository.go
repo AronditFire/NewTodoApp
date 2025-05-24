@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate mockgen -source=repository.go -destination=mocks/mock.go
+
 type TaskList interface {
 	CreateTask(userID int, task entity.Task) error
 	GetAllTask(userID int) ([]entity.Task, error)

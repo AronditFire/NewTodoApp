@@ -16,7 +16,7 @@ func NewTaskService(repo repository.TaskList) *TaskService {
 }
 
 func (s *TaskService) CreateTask(userID int, task entity.Task) error {
-	if (len(task.Description) > 0) || (len(task.Description) < 1000) {
+	if len(task.Description) > 0 && len(task.Description) < 1000 {
 		return s.repo.CreateTask(userID, task)
 	} else {
 		return errors.New("Invalid description length!")
@@ -36,7 +36,7 @@ func (s *TaskService) GetTaskByID(userID, id int) (entity.Task, error) {
 }
 
 func (s *TaskService) UpdateTask(userID, taskId int, desc string) error {
-	if (len(desc) > 0) || (len(desc) < 1000) {
+	if (len(desc) > 0) && (len(desc) < 1000) {
 		return s.repo.UpdateTask(userID, taskId, desc)
 	} else {
 		return errors.New("Invalid description length to update!")

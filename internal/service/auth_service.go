@@ -18,6 +18,10 @@ var (
 	RefreshTokenTTL = 24 * time.Hour
 )
 
+// Added variable for password hashing so it can be overridden in tests.
+var generatePasswordHash = bcrypt.GenerateFromPassword
+var CompareHashAndPassword = bcrypt.CompareHashAndPassword
+
 type TokenClaims struct {
 	jwt.RegisteredClaims
 	UserID  int
@@ -36,7 +40,8 @@ func (s *AuthService) CreateUser(userReg entity.UserRegisterRequest) error {
 	if (len(userReg.Username) < 3) || (len(userReg.Username) > 50) {
 		return errors.New("bad username length")
 	}
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userReg.Password), bcrypt.DefaultCost)
+	// Use the variable instead of calling bcrypt.GenerateFromPassword directly.
+	hashedPassword, err := generatePasswordHash([]byte(userReg.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return errors.New("Could not hash user password")
 	}
@@ -63,7 +68,7 @@ func (s *AuthService) LoginUser(userLogin entity.UserAuthRequest) (string, strin
 		return "", "", err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password)); err != nil {
+	if err := CompareHashAndPassword([]byte(user.Password), []byte(userLogin.Password)); err != nil {
 		return "", "", errors.New("Incorrect password")
 	}
 	// access token
