@@ -30,7 +30,7 @@ func (r *AuthRepo) CreateUser(user entity.UserRegisterRequest) error {
 		return err
 	}
 
-	if err := tx.Create(&newUser).Error; err != nil { // error maybe
+	if err := tx.Create(&newUser).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
