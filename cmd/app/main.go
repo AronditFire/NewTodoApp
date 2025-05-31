@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	server "github.com/AronditFire/todo-app"
+	"github.com/AronditFire/todo-app/internal/cache"
 	db "github.com/AronditFire/todo-app/internal/database"
 	"github.com/AronditFire/todo-app/internal/handlers"
 	"github.com/AronditFire/todo-app/internal/repository"
@@ -36,8 +37,14 @@ func main() {
 		log.Fatalf("Could not connect to database: %v", err)
 	}
 
+	rdb, err := cache.InitRedis() // connect to Redis
+	if err != nil {
+		log.Fatalf("Could not connect to Redis: %v", err)
+	}
+
 	repo := repository.NewRepository(database)
-	srv := service.NewService(repo)
+	crepo := cache.NewRedisRepository(rdb, repo)
+	srv := service.NewService(crepo, repo)
 	handler := handlers.NewHander(srv)
 
 	server := new(server.Server)
@@ -62,6 +69,10 @@ func main() {
 
 	if err := db.CloseConnection(database); err != nil {
 		log.Fatalf("Failed to close connection with database: %v", err)
+	}
+
+	if err := cache.CloseRedisConnection(rdb); err != nil {
+		log.Fatalf("Failed to close connection with Redis: %v", err)
 	}
 
 	log.Println("Database connection successfully stopped")

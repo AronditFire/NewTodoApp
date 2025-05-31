@@ -8,7 +8,7 @@ import (
 //go:generate mockgen -source=repository.go -destination=mocks/mock.go
 
 type TaskList interface {
-	CreateTask(userID int, task entity.Task) error
+	CreateTask(userID int, task entity.Task) (int, error)
 	GetAllTask(userID int) ([]entity.Task, error)
 	GetTaskByID(userID, id int) (entity.Task, error)
 	UpdateTask(userID, taskId int, desc string) error

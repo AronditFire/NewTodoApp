@@ -13,7 +13,7 @@ func NewTaskRepo(db *gorm.DB) *TaskRepo {
 	return &TaskRepo{db: db}
 }
 
-func (r *TaskRepo) CreateTask(userID int, task entity.Task) error {
+func (r *TaskRepo) CreateTask(userID int, task entity.Task) (int, error) {
 	tx := r.db.Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -22,17 +22,17 @@ func (r *TaskRepo) CreateTask(userID int, task entity.Task) error {
 	}()
 
 	if err := tx.Error; err != nil {
-		return err
+		return 0, err
 	}
 
 	task.UserID = userID
 
 	if err := tx.Create(&task).Error; err != nil {
 		tx.Rollback()
-		return err
+		return 0, err
 	}
 
-	return tx.Commit().Error
+	return task.ID, tx.Commit().Error
 
 }
 

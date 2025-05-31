@@ -87,7 +87,7 @@ func (h *Handler) createTask(c *gin.Context) {
 		return
 	}
 
-	err = h.services.TaskList.CreateTask(userID, req)
+	id, err := h.services.TaskList.CreateTask(userID, req)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not create task in database",
@@ -97,6 +97,7 @@ func (h *Handler) createTask(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "created",
+		"id":      id,
 	})
 }
 

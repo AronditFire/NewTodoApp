@@ -67,7 +67,7 @@ func TestCreateTask(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mock()
-			err := r.CreateTask(tt.inputUserID, tt.inputTask)
+			_, err := r.CreateTask(tt.inputUserID, tt.inputTask)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -99,7 +99,7 @@ func TestTask_CreateTask_PanicRecovery(t *testing.T) {
 	// Вызываем — внутри должен произойти panic, но благодаря defer+recover
 	// функция вернёт nil и не «упадёт» в тесте.
 	assert.NotPanics(t, func() {
-		err := r.CreateTask(1, entity.Task{
+		_, err := r.CreateTask(1, entity.Task{
 			Description: "Test Task",
 			UserID:      1,
 		})

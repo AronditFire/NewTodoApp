@@ -2,13 +2,14 @@ package service
 
 import (
 	"github.com/AronditFire/todo-app/entity"
+	"github.com/AronditFire/todo-app/internal/cache"
 	"github.com/AronditFire/todo-app/internal/repository"
 )
 
 //go:generate mockgen -source=service.go -destination=mocks/mock.go
 
 type TaskList interface {
-	CreateTask(userID int, task entity.Task) error
+	CreateTask(userID int, task entity.Task) (int, error)
 	GetAllTask(userID int) ([]entity.Task, error)
 	GetTaskByID(userID, id int) (entity.Task, error)
 	UpdateTask(userID, taskId int, desc string) error
@@ -36,9 +37,9 @@ type Service struct {
 	ParsingJSON
 }
 
-func NewService(repo *repository.Repository) *Service {
+func NewService(crepo *cache.RedisRepository, repo *repository.Repository) *Service {
 	return &Service{
-		TaskList:      NewTaskService(repo.TaskList),
+		TaskList:      NewTaskService(crepo.TaskList),
 		Authorization: NewAuthService(repo.Authorization),
 		ParsingJSON:   NewParseService(repo.ParsingJSON),
 	}
