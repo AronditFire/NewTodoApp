@@ -1,7 +1,9 @@
 package service
 
 import (
+	"context"
 	"errors"
+	"net/http"
 	"os"
 	"time"
 
@@ -9,6 +11,8 @@ import (
 	"github.com/AronditFire/todo-app/internal/repository"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 var (
@@ -29,11 +33,21 @@ type TokenClaims struct {
 }
 
 type AuthService struct {
-	repo repository.Authorization
+	repo              repository.Authorization
+	googleOauthConfig *oauth2.Config
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repository.Authorization, clientID, clientsecret, redirectUrl string) *AuthService {
+	return &AuthService{
+		repo: repo,
+		googleOauthConfig: &oauth2.Config{
+			ClientID:     clientID,
+			ClientSecret: clientsecret,
+			RedirectURL:  redirectUrl,
+			Scopes:       []string{"https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"},
+			Endpoint:     google.Endpoint,
+		},
+	}
 }
 
 func (s *AuthService) CreateUser(userReg entity.UserRegisterRequest) error {
@@ -180,4 +194,22 @@ func (s *AuthService) RenewTokens(id int) (string, string, error) {
 
 	// summary
 	return accessTokenSigned, refreshTokenSigned, err
+}
+
+// oauth
+
+func (s *AuthService) GoogleLogin() string {
+	url := s.googleOauthConfig.AuthCodeURL("randomstate" /*, oauth2.AccessTypeOffline*/)
+	return url
+}
+
+func (s *AuthService) GetClientGoogle(code string) (*http.Client, error) {
+	token, err := s.googleOauthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		return nil, err
+	}
+
+	client := s.googleOauthConfig.Client(context.Background(), token)
+
+	return client, nil
 }

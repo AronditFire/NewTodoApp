@@ -44,7 +44,7 @@ func main() {
 
 	repo := repository.NewRepository(database)
 	crepo := cache.NewRedisRepository(rdb, repo)
-	srv := service.NewService(crepo, repo)
+	srv := service.NewService(crepo, repo, os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"), os.Getenv("REDIRECT_URL"))
 	handler := handlers.NewHander(srv)
 
 	server := new(server.Server)

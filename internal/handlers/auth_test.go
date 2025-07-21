@@ -69,7 +69,7 @@ func TestHandler_registerUser(t *testing.T) {
 			repo := mock_service.NewMockAuthorization(c)
 			tt.mockBehaivor(repo, tt.inputUser)
 
-			service := &service.Service{Authorization: repo}
+			service := &service.Service{Authorization: /*repo*/ nil}
 			handler := NewHander(service)
 
 			// Arrange
@@ -145,7 +145,7 @@ func TestHandler_loginUser(t *testing.T) {
 
 			tt.mockBehaivor(repo, tt.inputUser)
 
-			service := &service.Service{Authorization: repo}
+			service := &service.Service{Authorization: /*repo*/ nil}
 			handler := &Handler{service}
 
 			r := gin.New()
@@ -248,7 +248,7 @@ func TestHandler_refreshTokens(t *testing.T) {
 			tt.mockRefreshBehaivor(repo, tt.inputToken.RefreshToken)
 			tt.mockRenewBehaivor(repo, tt.inputID)
 
-			service := &service.Service{Authorization: repo}
+			service := &service.Service{Authorization: /*repo*/ nil}
 			handler := &Handler{service}
 
 			r := gin.New()

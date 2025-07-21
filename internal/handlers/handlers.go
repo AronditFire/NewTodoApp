@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"net/http"
+
 	_ "github.com/AronditFire/todo-app/docs"
 	"github.com/AronditFire/todo-app/internal/service"
 	"github.com/gin-gonic/gin"
@@ -19,7 +21,25 @@ func NewHander(sv *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
+	router.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+		c.Next()
+	})
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	oauth := router.Group("/oauth2")
+	{
+		oauth.GET("/login", h.authLogin)
+		oauth.GET("/callback", h.callbackGoogle)
+	}
 
 	auth := router.Group("/auth")
 	{

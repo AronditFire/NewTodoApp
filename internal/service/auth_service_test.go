@@ -53,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 			mockAuthRepo := mock_repository.NewMockAuthorization(ctrl)
 			tt.mockBehavior(mockAuthRepo, tt.inputUser)
 
-			authService := NewAuthService(mockAuthRepo)
+			authService := NewAuthService( /*mockRepo*/ nil, "", "", "")
 
 			err := authService.CreateUser(tt.inputUser)
 
@@ -72,8 +72,8 @@ func TestCreateUser_GeneratePasswordHashError(t *testing.T) {
 	t.Run("Hash Pass Error", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
-		mockAuthRepo := mock_repository.NewMockAuthorization(ctrl)
-		authService := NewAuthService(mockAuthRepo)
+		/*mockAuthRepo*/ _ = mock_repository.NewMockAuthorization(ctrl)
+		authService := NewAuthService( /*mockRepo*/ nil, "", "", "")
 		err := authService.CreateUser(entity.UserRegisterRequest{
 			Username: "testuser",
 			Password: "testpassword",
@@ -87,7 +87,7 @@ func TestGetUser(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockAuthRepo := mock_repository.NewMockAuthorization(ctrl)
-	authService := NewAuthService(mockAuthRepo)
+	authService := NewAuthService( /*mockRepo*/ nil, "", "", "")
 
 	user := entity.User{ID: 1, Username: "testuser", Password: "hashedpassword"}
 	mockAuthRepo.EXPECT().GetUser("testuser").Return(user, nil)
@@ -102,7 +102,7 @@ func TestGetUserByID(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockAuthRepo := mock_repository.NewMockAuthorization(ctrl)
-	authService := NewAuthService(mockAuthRepo)
+	authService := NewAuthService( /*mockRepo*/ nil, "", "", "")
 
 	user := entity.User{ID: 1, Username: "testuser", Password: "hashedpassword"}
 	mockAuthRepo.EXPECT().GetUserByID(1).Return(user, nil)
@@ -200,7 +200,7 @@ func TestLoginUser(t *testing.T) {
 			mockRepo := mock_repository.NewMockAuthorization(ctrl)
 			tt.mockBehavior(mockRepo, tt.inputLogin.Username)
 
-			authService := NewAuthService(mockRepo)
+			authService := NewAuthService( /*mockRepo*/ nil, "", "", "")
 			accessToken, refreshToken, err := authService.LoginUser(tt.inputLogin)
 
 			if tt.expectedError == "" {

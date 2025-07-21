@@ -12,6 +12,7 @@ require (
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.2.1 // indirect
@@ -61,6 +62,7 @@ require (
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.17.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/oauth2 v0.30.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect

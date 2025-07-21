@@ -1,6 +1,8 @@
 package service
 
 import (
+	"net/http"
+
 	"github.com/AronditFire/todo-app/entity"
 	"github.com/AronditFire/todo-app/internal/cache"
 	"github.com/AronditFire/todo-app/internal/repository"
@@ -24,6 +26,8 @@ type Authorization interface {
 	ParseAccessToken(accessTokenStr string) (*TokenClaims, error)
 	ParseRefreshToken(refreshTokenStr string) (int, error)
 	RenewTokens(id int) (string, string, error)
+	GoogleLogin() string
+	GetClientGoogle(code string) (*http.Client, error)
 }
 
 type ParsingJSON interface {
@@ -37,10 +41,10 @@ type Service struct {
 	ParsingJSON
 }
 
-func NewService(crepo *cache.RedisRepository, repo *repository.Repository) *Service {
+func NewService(crepo *cache.RedisRepository, repo *repository.Repository, id, secret, rURL string) *Service {
 	return &Service{
 		TaskList:      NewTaskService(crepo.TaskList),
-		Authorization: NewAuthService(repo.Authorization),
+		Authorization: NewAuthService(repo.Authorization, id, secret, rURL),
 		ParsingJSON:   NewParseService(repo.ParsingJSON),
 	}
 }

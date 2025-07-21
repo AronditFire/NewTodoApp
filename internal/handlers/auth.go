@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/AronditFire/todo-app/entity"
@@ -106,5 +107,54 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"accessToken":  newAccess,
 		"refreshToken": newRefresh,
+	})
+}
+
+// OAuth
+
+func (h *Handler) authLogin(c *gin.Context) {
+	url := h.services.Authorization.GoogleLogin()
+	c.Redirect(http.StatusTemporaryRedirect, url)
+}
+
+func (h *Handler) callbackGoogle(c *gin.Context) {
+	code := c.Query("code")
+	state := c.Query("state")
+
+	// Проверка состояния для защиты от CSRF
+	if state != "randomstate" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid state parameter"})
+		return
+	}
+
+	client, err := h.services.Authorization.GetClientGoogle(code)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	defer resp.Body.Close()
+
+	var userInfo map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user info"})
+		return
+	}
+
+	// Возвращаем данные пользователя
+	c.JSON(http.StatusOK, gin.H{
+		"name":  userInfo["name"],
+		"email": userInfo["email"],
+		"id":    userInfo["id"],
 	})
 }

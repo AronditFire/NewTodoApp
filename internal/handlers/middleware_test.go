@@ -93,7 +93,7 @@ func TestHandler_userIdentify(t *testing.T) {
 			repo := mock_service.NewMockAuthorization(c)
 			tt.mockBehaivor(repo, tt.token)
 
-			service := &service.Service{Authorization: repo}
+			service := &service.Service{Authorization: /*repo*/ nil}
 			handler := Handler{service}
 
 			r := gin.New()

@@ -1,6 +1,7 @@
 services:
   todo-app:
     build: ./
+    container_name: my-todo-app
     command: ["sh", "-c", "./wait-for-postgres.sh db ./todo-app"]
     ports:
       - 8080:8080
@@ -17,7 +18,7 @@ services:
     image: postgres:latest
     container_name: postgres_db
     volumes:
-    - ./.database/postgres/data:/var/lib/postgresql/data
+      - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=testpassword
     ports:
