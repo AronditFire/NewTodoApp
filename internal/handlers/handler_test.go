@@ -10,7 +10,7 @@ func TestInitRoutes(t *testing.T) {
 	// Создаём «пустой» handler, если у него нет обязательных зависимостей,
 	// или можете передать заглушки так же, как в других тестах.
 	h := &Handler{}
-	engine := h.InitRoutes()
+	engine := h.InitRoutes(nil) // delete nil
 	routes := engine.Routes()
 
 	// Формируем карту из строк "<METHOD> <PATH>" для быстрого поиска

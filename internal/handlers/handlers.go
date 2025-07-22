@@ -18,7 +18,7 @@ func NewHander(sv *service.Service) *Handler {
 	return &Handler{services: sv}
 }
 
-func (h *Handler) InitRoutes() *gin.Engine {
+func (h *Handler) InitRoutes(healthFunc http.HandlerFunc) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(func(c *gin.Context) {
@@ -34,6 +34,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	})
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	router.GET("/health", gin.WrapF(healthFunc))
 
 	oauth := router.Group("/oauth2")
 	{

@@ -13,6 +13,7 @@ import (
 	"github.com/AronditFire/todo-app/internal/handlers"
 	"github.com/AronditFire/todo-app/internal/repository"
 	"github.com/AronditFire/todo-app/internal/service"
+	"github.com/AronditFire/todo-app/internal/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -47,10 +48,12 @@ func main() {
 	srv := service.NewService(crepo, repo, os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"), os.Getenv("REDIRECT_URL"))
 	handler := handlers.NewHander(srv)
 
+	healthHandlerFunc := utils.NewChecker(database, rdb)
+
 	server := new(server.Server)
 	go func() {
 		log.Printf("Starting server at port: %s", string(os.Getenv("PORT")))
-		if err := server.Run(string(os.Getenv("PORT")), handler.InitRoutes()); err != nil {
+		if err := server.Run(string(os.Getenv("PORT")), handler.InitRoutes(healthHandlerFunc)); err != nil {
 			log.Fatalf("Could not run server : %v", err)
 		}
 	}()
